@@ -23,6 +23,7 @@ function App (){
   // Handle open and close for modal
   const [newPark, setShowNew] = useState(false);
   const [editPark, setShowEdit] = useState(false);
+  const [delPark, setShowDelete] = useState(false);
 
   // list all parkings
   useEffect(() => {
@@ -98,13 +99,17 @@ function App (){
   }
 
   // delete a parking
-  function deleteParking(id){
+  let deleteParking = async (e) =>{
+    e.preventDefault();
     try {
-      fetch('http://127.0.0.1:8000/parkings/' + id, {
-        method: 'DELETE',
+      let res = await fetch('http://127.0.0.1:8000/parkings/' + oneParking.id, {
+        method: 'DELETE'
       })
-      .then(res => res.text())
-      .then(res => console.log('deleted'))
+      if (res.status === 200) {
+        setMessage("Parking supprimé (refresh pas implémenté encore)");
+      } else {
+        setMessage("Une erreur est survenue");
+      }
     } catch (err) {
       console.log(err);
     }
@@ -126,7 +131,11 @@ function App (){
                 setOneParking({id: id, name: name, type: type, city: city})
               }}>
               <Icon.Pencil /></button>
-              <button className='btn btn-danger' onClick={deleteParking.bind(this, id)}><Icon.Trash /></button>
+              <button className='btn btn-danger' onClick={ () => {
+                setShowDelete(true)
+                setOneParking({id: id, name: name})
+              }}>
+              <Icon.Trash /></button>
             </div>
           </li>
         ))}
@@ -169,6 +178,23 @@ function App (){
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={ () => setShowEdit(false) }>Fermer</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal pour delete le parking */}
+      <Modal show={delPark} onHide={ () => setShowEdit(false) }>
+        <Modal.Header closeButton>
+          <Modal.Title>Supprimer un parking</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <div>êtes vous sur de vouloir supprimer le parking : {oneParking.name}?</div>
+            <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={ deleteParking }>Confirmer</Button>
+          <Button variant="secondary" onClick={ () => setShowEdit(false) }>Annuler</Button>
         </Modal.Footer>
       </Modal>
 
