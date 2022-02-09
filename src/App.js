@@ -182,7 +182,7 @@ function App (){
       </Modal>
 
       {/* Modal pour delete le parking */}
-      <Modal show={delPark} onHide={ () => setShowEdit(false) }>
+      <Modal show={delPark} onHide={ () => setShowDelete(false) }>
         <Modal.Header closeButton>
           <Modal.Title>Supprimer un parking</Modal.Title>
         </Modal.Header>
@@ -194,7 +194,7 @@ function App (){
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={ deleteParking }>Confirmer</Button>
-          <Button variant="secondary" onClick={ () => setShowEdit(false) }>Annuler</Button>
+          <Button variant="secondary" onClick={ () => setShowDelete(false) }>Annuler</Button>
         </Modal.Footer>
       </Modal>
 
