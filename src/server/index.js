@@ -15,6 +15,7 @@ app.use(
 
 app.get('/parkings', (req,res) => {
     res.status(200).json(parkings)
+    res.status(404).send('parking non trouvé :(')
 })
 
 app.get('/parkings/:id', (req,res) => {
@@ -28,7 +29,7 @@ app.post('/parkings', (req,res) => {
     res.status(200).json(parkings)
 })
 
-app.put('/parkings/:id', (req,res) => {
+app.patch('/parkings/:id', (req,res) => {
     const id = parseInt(req.params.id)
     let parking = parkings.find(parking => parking.id === id)
     parking.name = req.body.name,

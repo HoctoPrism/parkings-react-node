@@ -11,6 +11,7 @@ function App (){
   let parkings = "parkings";
 
   const [data, setData] = useState(null); // array of data
+  const [oneParking, setOneParking] = useState(""); // get parking
   const [loading, setLoading] = useState(true); // WIP
   const [error, setError] = useState(null); // WIP
   const [id, setID] = useState("");
@@ -20,9 +21,8 @@ function App (){
   const [message, setMessage] = useState("");
 
   // Handle open and close for modal
-  const [newPark, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [newPark, setShowNew] = useState(false);
+  const [editPark, setShowEdit] = useState(false);
 
   // list all parkings
   useEffect(() => {
@@ -63,14 +63,39 @@ function App (){
         setCity("");
         setID("");
         setMessage("Parking ajouté (refresh pas implémenté encore)");
-        console.log();
       } else {
         setMessage("Une erreur est survenue");
       }
     } catch (err) {
       console.log(err);
     }
-}
+  }
+
+  // edit a parking
+  let editParkForm = async (e) => {
+    e.preventDefault();
+    try {
+      let res = await fetch("http://127.0.0.1:8000/parkings/" + oneParking.id, {
+        method: "PATCH",
+        headers: {
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify({
+          id: id ? id : parseInt(oneParking.id),
+          name: name ? name : oneParking.name,
+          type: type ? type : oneParking.type,
+          city: city ? city : oneParking.city,
+        }),
+      });
+      if (res.status === 200) {
+        setMessage("Parking modifié (refresh pas implémenté encore)");
+      } else {
+        setMessage("Une erreur est survenue");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   // delete a parking
   function deleteParking(id){
@@ -88,20 +113,27 @@ function App (){
   return (
     <div className='d-flex flex-column'>
       <h1 className='text-center my-5'>Liste des {parkings}</h1>
-      <button className='btn btn-primary my-3 align-self-center' onClick={handleShow}>Ajouter un parking</button>
+      <button className='btn btn-primary my-3 align-self-center' onClick={ () => setShowNew(true) }>Ajouter un parking</button>
       <ul className='d-flex'>{data && data.map(({ id, name, city, type }) => (
           <li key={id} className="card mx-3 w-100 bg-secondary text-white">
-            <div>{id}</div>
-            <div>{name}</div>
-            <div>{type}</div>
-            <div>{city}</div>
+            <div>ID : {id}</div>
+            <div>Nom : {name}</div>
+            <div>Type : {type}</div>
+            <div>Ville : {city}</div>
             <div>
+              <button className='btn btn-success' onClick={ () => {
+                setShowEdit(true)
+                setOneParking({id: id, name: name, type: type, city: city})
+              }}>
+              <Icon.Pencil /></button>
               <button className='btn btn-danger' onClick={deleteParking.bind(this, id)}><Icon.Trash /></button>
             </div>
           </li>
         ))}
       </ul>
-      <Modal show={newPark} onHide={handleClose}>
+
+      {/* Modal pour le nouveau parking */}
+      <Modal show={newPark} onHide={ () => setShowNew(false) }>
         <Modal.Header closeButton>
           <Modal.Title>Ajouter un parking</Modal.Title>
         </Modal.Header>
@@ -116,9 +148,30 @@ function App (){
         </form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>Fermer</Button>
+          <Button variant="secondary" onClick={ () => setShowNew(false) }>Fermer</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal pour edit le parking */}
+      <Modal show={editPark} onHide={ () => setShowEdit(false) }>
+        <Modal.Header closeButton>
+          <Modal.Title>Modifier un parking</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <form onSubmit={editParkForm}>
+          <input type="number" defaultValue={oneParking.id} placeholder="ID" onChange={(e) => setID(e.target.value)}/>
+          <input type="text" defaultValue={oneParking.name} placeholder="Name" onChange={(e) => setName(e.target.value)}/>
+          <input type="text" defaultValue={oneParking.type} placeholder="Type" onChange={(e) => setType(e.target.value)}/>
+          <input type="text" defaultValue={oneParking.city} placeholder="City" onChange={(e) => setCity(e.target.value)}/>
+          <input type="submit" value="Envoyer"/>
+          <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+        </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={ () => setShowEdit(false) }>Fermer</Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 
