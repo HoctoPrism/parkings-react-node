@@ -116,85 +116,87 @@ function App (){
   }
     
   return (
-    <div className='d-flex flex-column'>
+    <div className='container d-flex flex-column'>
       <h1 className='text-center my-5'>Liste des {parkings}</h1>
-      <button className='btn btn-primary my-3 align-self-center' onClick={ () => setShowNew(true) }>Ajouter un parking</button>
-      <ul className='d-flex'>{data && data.map(({ id, name, city, type }) => (
-          <li key={id} className="card mx-3 w-100 bg-secondary text-white">
-            <div>ID : {id}</div>
-            <div>Nom : {name}</div>
-            <div>Type : {type}</div>
-            <div>Ville : {city}</div>
-            <div>
-              <button className='btn btn-success' onClick={ () => {
-                setShowEdit(true)
-                setOneParking({id: id, name: name, type: type, city: city})
-              }}>
-              <Icon.Pencil /></button>
-              <button className='btn btn-danger' onClick={ () => {
-                setShowDelete(true)
-                setOneParking({id: id, name: name})
-              }}>
-              <Icon.Trash /></button>
-            </div>
-          </li>
+      <button className='btn bg-clair my-3 align-self-center' onClick={ () => setShowNew(true) }>AJOUTER UN PARKING</button>
+      <ul className='row row-cols-6'>{data && data.map(({ id, name, city, type }) => (
+        <li key={id} className="col card shadow alt-bg-sombre m-3 pt-2">
+          <div>ID : {id}</div>
+          <div>Nom : {name}</div>
+          <div>Type : {type}</div>
+          <div>Ville : {city}</div>
+          <div className='my-2 d-flex justify-content-evenly align-items-center'>
+            <button className='btn btn-success d-flex align-items-center py-2' onClick={ () => {
+              setShowEdit(true)
+              setOneParking({id: id, name: name, type: type, city: city})
+            }}>
+            <Icon.Pencil />
+            </button>
+            <button className='btn btn-danger d-flex align-items-center py-2' onClick={ () => {
+              setShowDelete(true)
+              setOneParking({id: id, name: name})
+            }}>
+            <Icon.Trash />
+            </button>
+          </div>
+        </li>
         ))}
       </ul>
 
       {/* Modal pour le nouveau parking */}
-      <Modal show={newPark} onHide={ () => setShowNew(false) }>
-        <Modal.Header closeButton>
+      <Modal show={newPark} onHide={ () => setShowNew(false) } >
+        <Modal.Header className="bg-sombre">
           <Modal.Title>Ajouter un parking</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-        <form onSubmit={newParkForm}>
-          <input type="number" value={id} placeholder="ID" onChange={(e) => setID(e.target.value)}/>
-          <input type="text" value={name} placeholder="Name" onChange={(e) => setName(e.target.value)}/>
-          <input type="text" value={type} placeholder="Type" onChange={(e) => setType(e.target.value)}/>
-          <input type="text" value={city} placeholder="City" onChange={(e) => setCity(e.target.value)}/>
-          <input type="submit" value="Envoyer"/>
-          <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
-        </form>
+        <Modal.Body className="bg-sombre">
+          <form onSubmit={newParkForm} className="d-flex flex-column p-3">
+            <input type="number" value={id} placeholder="ID" onChange={(e) => setID(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+            <input type="text" value={name} placeholder="Name" onChange={(e) => setName(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+            <input type="text" value={type} placeholder="Type" onChange={(e) => setType(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+            <input type="text" value={city} placeholder="City" onChange={(e) => setCity(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+            <input type="submit" className='btn bg-clair mt-4' value="Envoyer"/>
+            <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+          </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={ () => setShowNew(false) }>Fermer</Button>
+        <Modal.Footer className="bg-sombre">
+          <Button className='bg-clair border-0 text-sombre' onClick={ () => setShowNew(false) }>Fermer</Button>
         </Modal.Footer>
       </Modal>
 
       {/* Modal pour edit le parking */}
       <Modal show={editPark} onHide={ () => setShowEdit(false) }>
-        <Modal.Header closeButton>
+        <Modal.Header className="bg-sombre">
           <Modal.Title>Modifier un parking</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-        <form onSubmit={editParkForm}>
-          <input type="number" defaultValue={oneParking.id} placeholder="ID" onChange={(e) => setID(e.target.value)}/>
-          <input type="text" defaultValue={oneParking.name} placeholder="Name" onChange={(e) => setName(e.target.value)}/>
-          <input type="text" defaultValue={oneParking.type} placeholder="Type" onChange={(e) => setType(e.target.value)}/>
-          <input type="text" defaultValue={oneParking.city} placeholder="City" onChange={(e) => setCity(e.target.value)}/>
-          <input type="submit" value="Envoyer"/>
+        <Modal.Body className="bg-sombre">
+        <form onSubmit={editParkForm} className="d-flex flex-column p-3">
+          <input type="number" defaultValue={oneParking.id} placeholder="ID" onChange={(e) => setID(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+          <input type="text" defaultValue={oneParking.name} placeholder="Name" onChange={(e) => setName(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+          <input type="text" defaultValue={oneParking.type} placeholder="Type" onChange={(e) => setType(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+          <input type="text" defaultValue={oneParking.city} placeholder="City" onChange={(e) => setCity(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
+          <input type="submit" className='btn bg-clair mt-4' value="Envoyer"/>
           <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
         </form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={ () => setShowEdit(false) }>Fermer</Button>
+        <Modal.Footer className="bg-sombre">
+          <Button className='bg-clair border-0 text-sombre' onClick={ () => setShowEdit(false) }>Fermer</Button>
         </Modal.Footer>
       </Modal>
 
       {/* Modal pour delete le parking */}
       <Modal show={delPark} onHide={ () => setShowDelete(false) }>
-        <Modal.Header closeButton>
+        <Modal.Header className="bg-sombre">
           <Modal.Title>Supprimer un parking</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="bg-sombre">
           <div>
             <div>êtes vous sur de vouloir supprimer le parking : {oneParking.name}?</div>
             <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
           </div>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="bg-sombre">
           <Button variant="danger" onClick={ deleteParking }>Confirmer</Button>
-          <Button variant="secondary" onClick={ () => setShowDelete(false) }>Annuler</Button>
+          <Button onClick={ () => setShowDelete(false) } className='bg-clair border-0 text-sombre'>Annuler</Button>
         </Modal.Footer>
       </Modal>
 
