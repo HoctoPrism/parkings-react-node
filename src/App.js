@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react/cjs/react.development';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import * as Icon from 'react-bootstrap-icons';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Toast, ToastContainer } from 'react-bootstrap';
+import update from 'immutability-helper';
 
 function App (){
 
@@ -19,11 +20,15 @@ function App (){
   const [type, setType] = useState("");
   const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
 
   // Handle open and close for modal
   const [newPark, setShowNew] = useState(false);
   const [editPark, setShowEdit] = useState(false);
   const [delPark, setShowDelete] = useState(false);
+
+  const [toastEdit, setShowToastEdit] = useState(false);
+  const [toastDel, setShowToastDel] = useState(false);
 
   // list all parkings
   useEffect(() => {
@@ -46,24 +51,26 @@ function App (){
   let newParkForm = async (e) => {
     e.preventDefault();
     try {
+      let newPark = {
+        id: parseInt(id),
+        name: name,
+        type: type,
+        city: city,
+      }
       let res = await fetch("http://127.0.0.1:8000/parkings/", {
         method: "POST",
         headers: {
           'Content-Type':'application/json'
         },
-        body: JSON.stringify({
-          id: parseInt(id),
-          name: name,
-          type: type,
-          city: city,
-        }),
+        body: JSON.stringify(newPark),
       });
       if (res.status === 200) {
+        data.push(newPark)
         setName("");
         setType("");
         setCity("");
         setID("");
-        setMessage("Parking ajouté (refresh pas implémenté encore)");
+        setMessage("Parking ajouté ! Vous pouvez en ajouter un autre");
       } else {
         setMessage("Une erreur est survenue");
       }
@@ -76,20 +83,25 @@ function App (){
   let editParkForm = async (e) => {
     e.preventDefault();
     try {
+      let updatedPark = {
+        id: id ? id : parseInt(oneParking.id),
+        name: name ? name : oneParking.name,
+        type: type ? type : oneParking.type,
+        city: city ? city : oneParking.city,
+      }
       let res = await fetch("http://127.0.0.1:8000/parkings/" + oneParking.id, {
         method: "PATCH",
         headers: {
           'Content-Type':'application/json'
         },
-        body: JSON.stringify({
-          id: id ? id : parseInt(oneParking.id),
-          name: name ? name : oneParking.name,
-          type: type ? type : oneParking.type,
-          city: city ? city : oneParking.city,
-        }),
+        body: JSON.stringify(updatedPark),
       });
       if (res.status === 200) {
-        setMessage("Parking modifié (refresh pas implémenté encore)");
+        const foundIndex = data.findIndex(x => x.id === oneParking.id);
+        setData(update(data, { [foundIndex]: {$set: updatedPark}}))
+        setShowEdit(false)
+        setShowToastEdit(true)
+        setToastMessage('Parking modifié !')
       } else {
         setMessage("Une erreur est survenue");
       }
@@ -106,7 +118,11 @@ function App (){
         method: 'DELETE'
       })
       if (res.status === 200) {
-        setMessage("Parking supprimé (refresh pas implémenté encore)");
+        const foundIndex = data.findIndex(x => x.id === oneParking.id);
+        setData(update(data, { $splice: [[foundIndex, 1]]}))
+        setShowDelete(false)
+        setShowToastDel(true)
+        setToastMessage("Parking supprimé");
       } else {
         setMessage("Une erreur est survenue");
       }
@@ -200,6 +216,23 @@ function App (){
         </Modal.Footer>
       </Modal>
 
+      {/* Toast pour edit le parking */}
+      <ToastContainer position="bottom-center">
+        <Toast className="mb-3" delay={3000} autohide show={toastEdit} onHide={ () => setShowToastEdit(false) } onClose={() => setShowToastEdit(false)}>
+          <Toast.Header>
+            <strong className="me-auto text-sombre">{toastMessage}</strong>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer> 
+
+      {/* Toast pour edit le parking */}
+      <ToastContainer position="bottom-center">
+        <Toast className="mb-3" delay={3000} autohide show={toastDel} onHide={ () => setShowToastDel(false) } onClose={() => setShowToastDel(false)}>
+          <Toast.Header>
+            <strong className="me-auto text-sombre">{toastMessage}</strong>
+          </Toast.Header>
+        </Toast>
+      </ToastContainer> 
     </div>
   );
 

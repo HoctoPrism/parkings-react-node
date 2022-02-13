@@ -28,11 +28,5 @@
     "name": "Parking 5",
     "type": "AIRPORT",
     "city": "LILLE"
-  },
-  {
-    "id": 6,
-    "name": "Parking 6",
-    "type": "Voiture volante",
-    "city": "Mars"
   }
 ]
