@@ -28,5 +28,11 @@
     "name": "Parking 5",
     "type": "AIRPORT",
     "city": "LILLE"
+  },
+  {
+    "id": 6,
+    "name": "fds",
+    "type": "fdsf",
+    "city": "fdsfsd"
   }
 ]

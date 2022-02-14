@@ -9,8 +9,6 @@ function App (){
 
   document.title = "First";
 
-  let parkings = "parkings";
-
   const [data, setData] = useState(null); // array of data
   const [oneParking, setOneParking] = useState(""); // get parking
   const [loading, setLoading] = useState(true); // WIP
@@ -27,6 +25,7 @@ function App (){
   const [editPark, setShowEdit] = useState(false);
   const [delPark, setShowDelete] = useState(false);
 
+  // Handle Toast event
   const [toastEdit, setShowToastEdit] = useState(false);
   const [toastDel, setShowToastDel] = useState(false);
 
@@ -52,7 +51,7 @@ function App (){
     e.preventDefault();
     try {
       let newPark = {
-        id: parseInt(id),
+        id: id ? parseInt(id) : (data.at(-1).id + 1),
         name: name,
         type: type,
         city: city,
@@ -133,7 +132,7 @@ function App (){
     
   return (
     <div className='container d-flex flex-column'>
-      <h1 className='text-center my-5'>Liste des {parkings}</h1>
+      <h1 className='text-center my-5'>Liste des parkings</h1>
       <button className='btn bg-clair my-3 align-self-center' onClick={ () => setShowNew(true) }>AJOUTER UN PARKING</button>
       <ul className='row row-cols-6'>{data && data.map(({ id, name, city, type }) => (
         <li key={id} className="col card shadow alt-bg-sombre m-3 pt-2">
@@ -144,12 +143,14 @@ function App (){
           <div className='my-2 d-flex justify-content-evenly align-items-center'>
             <button className='btn btn-success d-flex align-items-center py-2' onClick={ () => {
               setShowEdit(true)
+              setMessage('')
               setOneParking({id: id, name: name, type: type, city: city})
             }}>
             <Icon.Pencil />
             </button>
             <button className='btn btn-danger d-flex align-items-center py-2' onClick={ () => {
               setShowDelete(true)
+              setMessage('')
               setOneParking({id: id, name: name})
             }}>
             <Icon.Trash />
@@ -171,7 +172,7 @@ function App (){
             <input type="text" value={type} placeholder="Type" onChange={(e) => setType(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
             <input type="text" value={city} placeholder="City" onChange={(e) => setCity(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
             <input type="submit" className='btn bg-clair mt-4' value="Envoyer"/>
-            <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+            <div className="fw-bold text-success text-center mt-3">{message ? <p>{message}</p> : null}</div>
           </form>
         </Modal.Body>
         <Modal.Footer className="bg-sombre">
@@ -191,7 +192,7 @@ function App (){
           <input type="text" defaultValue={oneParking.type} placeholder="Type" onChange={(e) => setType(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
           <input type="text" defaultValue={oneParking.city} placeholder="City" onChange={(e) => setCity(e.target.value)} className="alt-bg-sombre border-0 rounded text-clair my-2 p-2"/>
           <input type="submit" className='btn bg-clair mt-4' value="Envoyer"/>
-          <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+          <div className="fw-bold text-danger text-center mt-3">{message ? <p>{message}</p> : null}</div>
         </form>
         </Modal.Body>
         <Modal.Footer className="bg-sombre">
@@ -207,7 +208,7 @@ function App (){
         <Modal.Body className="bg-sombre">
           <div>
             <div>êtes vous sur de vouloir supprimer le parking : {oneParking.name}?</div>
-            <div className="fw-bold text-center mt-3">{message ? <p>{message}</p> : null}</div>
+            <div className="fw-bold text-danger text-center mt-3">{message ? <p>{message}</p> : null}</div>
           </div>
         </Modal.Body>
         <Modal.Footer className="bg-sombre">
@@ -218,7 +219,7 @@ function App (){
 
       {/* Toast pour edit le parking */}
       <ToastContainer position="bottom-center">
-        <Toast className="mb-3" delay={3000} autohide show={toastEdit} onHide={ () => setShowToastEdit(false) } onClose={() => setShowToastEdit(false)}>
+        <Toast className="mb-3" delay={3000} autohide show={toastEdit} onClose={() => setShowToastEdit(false)}>
           <Toast.Header>
             <strong className="me-auto text-sombre">{toastMessage}</strong>
           </Toast.Header>
@@ -227,7 +228,7 @@ function App (){
 
       {/* Toast pour edit le parking */}
       <ToastContainer position="bottom-center">
-        <Toast className="mb-3" delay={3000} autohide show={toastDel} onHide={ () => setShowToastDel(false) } onClose={() => setShowToastDel(false)}>
+        <Toast className="mb-3" delay={3000} autohide show={toastDel} onClose={() => setShowToastDel(false)}>
           <Toast.Header>
             <strong className="me-auto text-sombre">{toastMessage}</strong>
           </Toast.Header>
