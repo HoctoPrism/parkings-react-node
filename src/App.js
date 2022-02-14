@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react/cjs/react.development';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import * as Icon from 'react-bootstrap-icons';
-import { Button, Modal, Toast, ToastContainer } from 'react-bootstrap';
+import { Button, InputGroup, Modal, Toast, ToastContainer } from 'react-bootstrap';
 import update from 'immutability-helper';
 
 function App (){
@@ -11,7 +11,7 @@ function App (){
 
   const [data, setData] = useState(null); // array of data
   const [oneParking, setOneParking] = useState(""); // get parking
-  const [loading, setLoading] = useState(true); // WIP
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); // WIP
   const [id, setID] = useState("");
   const [name, setName] = useState("");
@@ -19,6 +19,10 @@ function App (){
   const [city, setCity] = useState("");
   const [message, setMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
+
+  // Search Bar
+  const [searchInput, setSearchInput] = useState('');
+  const [searchResult, setSearchResult] = useState([]);
 
   // Handle open and close for modal
   const [newPark, setShowNew] = useState(false);
@@ -31,9 +35,22 @@ function App (){
 
   // list all parkings
   useEffect(() => {
+
+    // Searchbar
+    setSearchInput(searchInput);
+    if (searchInput !== '') {
+      const filtered = data.filter((item) => {
+        return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
+      })
+      setSearchResult(filtered)
+    } else {
+      setSearchResult(data)
+    }
+
     fetch(`http://127.0.0.1:8000/parkings`)
       .then((response) => response.json())
       .then((actualData) => {
+        setLoading(true)
         setData(actualData);
         setError(null);
       })
@@ -44,7 +61,8 @@ function App (){
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+
+  }, [searchInput]);
 
   // create a new parking
   let newParkForm = async (e) => {
@@ -129,36 +147,85 @@ function App (){
       console.log(err);
     }
   }
-    
+
   return (
-    <div className='container d-flex flex-column'>
+    <div className='container'>
       <h1 className='text-center my-5'>Liste des parkings</h1>
-      <button className='btn bg-clair my-3 align-self-center' onClick={ () => setShowNew(true) }>AJOUTER UN PARKING</button>
-      <ul className='row row-cols-6'>{data && data.map(({ id, name, city, type }) => (
-        <li key={id} className="col card shadow alt-bg-sombre m-3 pt-2">
-          <div>ID : {id}</div>
-          <div>Nom : {name}</div>
-          <div>Type : {type}</div>
-          <div>Ville : {city}</div>
-          <div className='my-2 d-flex justify-content-evenly align-items-center'>
-            <button className='btn btn-success d-flex align-items-center py-2' onClick={ () => {
-              setShowEdit(true)
-              setMessage('')
-              setOneParking({id: id, name: name, type: type, city: city})
-            }}>
-            <Icon.Pencil />
-            </button>
-            <button className='btn btn-danger d-flex align-items-center py-2' onClick={ () => {
-              setShowDelete(true)
-              setMessage('')
-              setOneParking({id: id, name: name})
-            }}>
-            <Icon.Trash />
-            </button>
-          </div>
-        </li>
-        ))}
-      </ul>
+      <div className='d-flex justify-content-center'>
+        <input 
+          type="text" 
+          name="search" 
+          id="search"
+          value={searchInput}
+          placeholder='Rechercher un parking, une ville, un type...' 
+          className='form-control my-3 w-50 alt-bg-sombre border-0 text-clair'
+          onChange={ (e) => setSearchInput(e.target.value) }
+          />
+      </div>
+      { loading ? (
+        <h2 className='text-center'>Chargement des parkings...</h2>
+      ) : (
+        <div className='d-flex flex-column'>
+          <button className='btn bg-clair my-3 align-self-center' onClick={ () => setShowNew(true) }>AJOUTER UN PARKING</button>
+
+          { searchInput.length >= 1 ? (
+            /* si il n'y a quelque chose dans la searchbar */
+            <ul className='row row-cols-6'>{searchResult && searchResult.map(({ id, name, city, type }) => (
+              <li key={id} className="col card shadow alt-bg-sombre m-3 pt-2">
+                <div>ID : {id}</div>
+                <div>Nom : {name}</div>
+                <div>Type : {type}</div>
+                <div>Ville : {city}</div>
+                <div className='my-2 d-flex justify-content-evenly align-items-center'>
+                  <button className='btn btn-success d-flex align-items-center py-2' onClick={ () => {
+                    setShowEdit(true)
+                    setMessage('')
+                    setOneParking({id: id, name: name, type: type, city: city})
+                  }}>
+                  <Icon.Pencil />
+                  </button>
+                  <button className='btn btn-danger d-flex align-items-center py-2' onClick={ () => {
+                    setShowDelete(true)
+                    setMessage('')
+                    setOneParking({id: id, name: name})
+                  }}>
+                  <Icon.Trash />
+                  </button>
+                </div>
+              </li>
+              ))}
+            </ul>
+          ) : (
+            /* si il n'y a rien dans la searchbar */
+            <ul className='row row-cols-6'>{data && data.map(({ id, name, city, type }) => (
+              <li key={id} className="col card shadow alt-bg-sombre m-3 pt-2">
+                <div>ID : {id}</div>
+                <div>Nom : {name}</div>
+                <div>Type : {type}</div>
+                <div>Ville : {city}</div>
+                <div className='my-2 d-flex justify-content-evenly align-items-center'>
+                  <button className='btn btn-success d-flex align-items-center py-2' onClick={ () => {
+                    setShowEdit(true)
+                    setMessage('')
+                    setOneParking({id: id, name: name, type: type, city: city})
+                  }}>
+                  <Icon.Pencil />
+                  </button>
+                  <button className='btn btn-danger d-flex align-items-center py-2' onClick={ () => {
+                    setShowDelete(true)
+                    setMessage('')
+                    setOneParking({id: id, name: name})
+                  }}>
+                  <Icon.Trash />
+                  </button>
+                </div>
+              </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+      )}
 
       {/* Modal pour le nouveau parking */}
       <Modal show={newPark} onHide={ () => setShowNew(false) } >
