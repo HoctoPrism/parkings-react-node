@@ -2,6 +2,16 @@ body {
   background-color: #1e2334 !important;
   color: #b6b4ca !important;
 }
+a {
+  text-decoration: none !important;
+  color: #b6b4ca !important;
+  margin-right: 1.5rem;
+  font-size: 1.2rem;
+}
+
+a.active {
+  font-weight: bold !important;
+}
 
 .text-clair {
   color: #b6b4ca !important;
@@ -9,6 +19,10 @@ body {
 
 .text-sombre {
   color: #1e2334 !important;
+}
+
+.alt-text-sombre {
+  color: #2c3049 !important;
 }
 
 .bg-clair {
