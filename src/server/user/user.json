@@ -1,14 +1,20 @@
 [
-    {
-        "id": 1,
-        "username": "admin",
-        "password": "admin",
-        "role": [ "ROLE_ADMIN" ]
-    },
-    {
-        "id": 2,
-        "username": "user",
-        "password": "user",
-        "role": [ "ROLE_USER" ]
-    }
-  ]
+  {
+    "id": 1,
+    "username": "admin",
+    "password": "$2a$10$TbEywgRdYipp2iizMAQiB.oD4x3fMlkvABCk5aVNhgYKnGRqb8rl.",
+    "role": [
+      "ROLE_ADMIN"
+    ],
+    "token": ""
+  },
+  {
+    "id": 2,
+    "username": "user",
+    "password": "$2a$10$VFGpixSc1MBHV3e5AzawLuMjkDsU1brzvt2mSkpSoINXudmAgeGl6",
+    "role": [
+      "ROLE_USER"
+    ],
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpYXQiOjE2NDUyMDcxMzEsImV4cCI6MTY0NTIxNDMzMX0.7CmVK1me8MLzoy5-4PR_NOJfhbpz6eROoygh4qEImxg"
+  }
+]
