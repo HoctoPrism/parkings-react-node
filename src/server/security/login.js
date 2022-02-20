@@ -31,27 +31,14 @@ app.post('/login', async (req, res) => {
     object = user.find(o => o.username === username) // check if a user exists
 
     if (object && bcrypt.compare(password, object.password)) {
-        /* mettre l'auth ici */
-
+        
         const token = jwt.sign(
-            { 
-                user_id: user._id, username 
-            },
+            { user_id: user._id, username },
             process.env.SECRET_KEY,
-            {
-              expiresIn: "2h",
-            }
+            { expiresIn: "8h" }
         );
 
-        fs.readFile(endpoint, function (err, data) {
-            var json = JSON.parse(data);
-            const foundIndex = user.findIndex(user => user.id === object.id)
-            object.token = token
-            json[foundIndex] = object
-            fs.writeFile(endpoint, JSON.stringify(json, null, 2), function(err, result) {
-                if(err) console.log('error', err);
-            });
-        }) 
+        res.status(200).send({'token': token})
         res.end();
 
     } else {

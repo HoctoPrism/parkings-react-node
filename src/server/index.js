@@ -10,6 +10,7 @@ const parking = require("./parking/parking");
 const login = require("./security/login");
 const register = require("./security/register");
 const auth = require("./security/auth");
+const user = require("./user/user");
 
 app.use(
     function (req, res, next) {
@@ -26,6 +27,7 @@ app.use(parking);
 app.use(login);
 app.use(register);
 app.use(auth);
+app.use(user);
 
 app.listen(8000, () => {
     console.log('Serveur à l\'écoute')

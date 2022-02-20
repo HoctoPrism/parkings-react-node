@@ -2,7 +2,9 @@ import React from "react";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import './App.css';
 import Home from "./home/home";
+import Login from "./login/login";
 import Parking from "./parking/parking";
+import PrivateRoute from "./server/security/protected-route";
 
 function App () {
 
@@ -32,8 +34,9 @@ function App () {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} >Accueil</Route>
-        <Route path="parkings" element={<Parking />} >Parking</Route>
+        <Route path="/" element={ <PrivateRoute Component={Home} /> } >Accueil</Route>
+        <Route path="parkings" element={ <PrivateRoute Component={Parking} /> } >Parking</Route>
+        <Route path="login" element={ <PrivateRoute Component={Login} /> } >Login</Route>
         <Route path="*" element={
           <div className="text-center fs-1 fw-bold">
             <p>Il n'y a rien ici !</p>
