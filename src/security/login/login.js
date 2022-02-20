@@ -1,5 +1,5 @@
 import { useState } from 'react/cjs/react.development';
-import '../App.css';
+import '../../App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Button, Form } from 'react-bootstrap';
 
@@ -28,7 +28,7 @@ function Login () {
             res.json().then( (resValue) => localStorage.setItem('access_token', resValue.token) );
             // redirect ioci
           } else {
-            console.log('caca');;
+            console.log('out');;
           }
         } catch (err) {
           console.log(err);

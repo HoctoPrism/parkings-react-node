@@ -1,22 +1,28 @@
 import jwtDecode from 'jwt-decode'
 import React from 'react'
 import Home from '../../home/home'
-import Login from '../../login/login'
+import Login from '../../security/login/login'
 
 const PrivateRoute = ({Component}) => {
 
-    let token = jwtDecode(localStorage.getItem('access_token'))
+    const token = localStorage.getItem('access_token');
     let expToken;
 
-    if (token && token.exp * 1000 < Date.now() === false) {
-        if (Component.name === 'Login') {
-            return expToken = <Home />
+    if (token) {
+        const decodedToken = jwtDecode(token)
+        if (decodedToken && decodedToken.exp * 1000 < Date.now() === false) {
+            if (Component.name === 'Login') {
+                return expToken = <Home />
+            } else {
+                return expToken = <Component />
+            }
         } else {
-            return expToken = <Component />
+            return expToken = <Login />
         }
     } else {
         return expToken = <Login />
     }
+
 
 }
 
