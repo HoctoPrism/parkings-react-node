@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 const user = require('../user/user.json')
-const endpoint = './src/server/user/user.json'
 
 app.use(
     function (req, res, next) {
@@ -23,7 +22,7 @@ app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     
 	if (!(username && password)) {
-        res.status(400).send('Veuillez entrer un Username et un Password !');
+        res.status(400).send({message: 'Veuillez entrer un Username et un Password !'});
 		res.end();
     }
 
@@ -42,7 +41,7 @@ app.post('/login', async (req, res) => {
         res.end();
 
     } else {
-        res.send('Username ou Password invalide !');
+        res.status(400).send({message: 'Username ou Password invalide !'});
         res.end();
     }			
     res.end();
