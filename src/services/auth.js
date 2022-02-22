@@ -28,7 +28,7 @@ function Register () {
 
   document.title = 'Inscription au site'
 
-  const { register, watch, handleSubmit, formState: { errors } } = useForm();
+  const { register, watch, handleSubmit, formState: { errors, isDirty, isValid } } = useForm({ mode: "onChange" });
   const username = watch('username', "");
   const password = watch('password', "");
   const [role, setRole] = useState("");
@@ -40,19 +40,15 @@ function Register () {
   const max = useRef()
   const num = useRef()
   const spec = useRef()
-  const valider = useRef()
 
   const minuscule = '(?=.*[a-z])'; // allow to test lowercase
   const majuscule = '(?=.*[A-Z])'; // allow to test uppercase
   const number = '(?=.*[0-9])'; // allow to test number
   const special = '(?=.*[!@#:$%^&])'; // allow to test special character
-  const errForm = { "min": true, "maj": true, "num": true, "spec": true }; // array of unvalid regex state
   
   useEffect(() => {
-/*     console.log(errForm); */
     // Check if password contains a lowercase
     if (password.match(minuscule)) {
-      errForm.min = false
       min.current.style.backgroundColor = "#4F9747"; // if yes, bg green
     } else {
       min.current.style.backgroundColor = "#ce0033"; // if not, bg red
@@ -60,7 +56,6 @@ function Register () {
 
     // Check if password contains a uppercase
     if (password.match(majuscule)) {
-      errForm.maj = false
       max.current.style.backgroundColor = "#4F9747"; // if yes, bg green
     } else {
       max.current.style.backgroundColor = "#ce0033"; // if not, bg red
@@ -68,7 +63,6 @@ function Register () {
 
     // Check if password contains a number
     if (password.match(number)) {
-      errForm.num = false
       num.current.style.backgroundColor = "#4F9747"; // if yes, bg green
     } else {
       num.current.style.backgroundColor = "#ce0033"; // if not, bg red
@@ -76,17 +70,12 @@ function Register () {
 
     // Check if password contains a special character
     if (password.match(special)) {
-      errForm.spec = false
       spec.current.style.backgroundColor = "#4F9747"; // if yes, bg green
     } else {
       spec.current.style.backgroundColor = "#ce0033"; // if not, bg red
     }
 
-    if (errForm.min && errForm.max && errForm.num && errForm.spec){
-      console.log('fion');
-    }
-
-  }, [password, errForm])
+  }, [password])
 
   let registerForm = async () => {
     setErrMessage('')
@@ -119,11 +108,9 @@ function Register () {
     <div className='d-flex justify-content-center align-items-center'>
       <Form className='w-25 mt-4' onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-        { errMessage ? <div className='fw-bold text-danger'>{errMessage.username}</div> : null} {/* gestion d'erreur prevenant de node */}
-        { errors.username ? <div className='fw-bold text-danger'>{errors.username.message}</div> : null} {/* gestion d'erreur prevenant de react */}
           <Form.Label className='fw-bold'>Email</Form.Label>
           <Form.Control
-            className='alt-bg-sombre text-clair border-0 shadow'
+            className='alt-bg-sombre text-clair border-0 shadow mb-2'
             type="text" 
             placeholder="username"
             {...register("username", {
@@ -131,16 +118,17 @@ function Register () {
               pattern: {
                 value: /^\S+@\S+$/i,
                 message: "Veuillez saisir un email valide"
-              }})}
+              }
+            })}
           />
+          { errMessage ? <div className='text-danger error'>{errMessage.username}</div> : null} {/* gestion d'erreur prevenant de node */}
+          { errors.username ? <div className='text-danger error'>{errors.username.message}</div> : null} {/* gestion d'erreur prevenant de react */}
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicPassword">
-        { errMessage ? <div className='fw-bold text-danger'>{errMessage.password}</div> : null} {/* gestion d'erreur prevenant de node */}
-        { errors.password ? <div className='fw-bold text-danger'>{errors.password.message}</div> : null} {/* gestion d'erreur prevenant de react */}
           <Form.Label className='fw-bold'>Mot de passe</Form.Label>
           <Form.Control
-            className='alt-bg-sombre text-clair border-0 shadow'
+            className='alt-bg-sombre text-clair border-0 shadow mb-2'
             type="password"
             placeholder="password"
             {...register("password", {
@@ -155,6 +143,8 @@ function Register () {
               }
             })}
           />
+          { errMessage ? <div className='text-danger error'>{errMessage.password}</div> : null} {/* gestion d'erreur prevenant de node */}
+          { errors.password ? <div className='text-danger error'>{errors.password.message}</div> : null} {/* gestion d'erreur prevenant de react */}
         </Form.Group>
 
         <div className="regex">
@@ -176,7 +166,7 @@ function Register () {
           </div>
         </div>
 
-        <Button type="submit" ref={valider} className='bg-clair border-0 text-sombre'>VALIDER</Button>
+        <Button type="submit" disabled={!isDirty || !isValid} className='bg-clair border-0 text-sombre'>VALIDER</Button>
       </Form>
     </div>
 
