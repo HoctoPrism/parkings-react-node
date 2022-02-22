@@ -51,7 +51,7 @@ function Register () {
         if (res.status === 200) {
           setShowToastRegister(true)
         } else {
-          res.json().then(( errValue => setErrMessage(errValue.message) ));
+          res.json().then(( errValue => setErrMessage(errValue) ));
         }
       } catch (err) {
         console.log(err);
@@ -60,32 +60,37 @@ function Register () {
 
   return <div className='text-center'>
     <h1 className='mb-3'>Inscription au site</h1>
-    { errMessage ? <h4 className='fw-bold text-danger'>{errMessage}</h4> : null}
-    <Form className='d-flex justify-content-center align-items-center flex-column mt-4' onSubmit={register}>
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label className='fw-bold'>Email ou username</Form.Label>
-        <Form.Control
-          name="emailOrUsername"
-          type="text" 
-          placeholder="email ou username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label className='fw-bold'>Mot de passe</Form.Label>
+    <div className='d-flex justify-content-center align-items-center'>
+      <Form className='w-25 mt-4' onSubmit={register}>
+        <Form.Group className="mb-3" controlId="formBasicEmail">
+        { errMessage ? <div className='fw-bold text-danger'>{errMessage.username}</div> : null}
+          <Form.Label className='fw-bold'>Email</Form.Label>
           <Form.Control
+            className='alt-bg-sombre text-clair border-0 shadow'
+            name="emailOrUsername"
+            type="text" 
+            placeholder="email"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+        { errMessage ? <div className='fw-bold text-danger'>{errMessage.password}</div> : null}
+            <Form.Label className='fw-bold'>Mot de passe</Form.Label>
+            <Form.Control
+              className='alt-bg-sombre text-clair border-0 shadow'
               name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Mot de passe" 
-          />
-      </Form.Group>
+            />
+        </Form.Group>
 
-      <Button type="submit" className='bg-clair border-0 text-sombre'>VALIDER</Button>
-    </Form>
+        <Button type="submit" className='bg-clair border-0 text-sombre'>VALIDER</Button>
+      </Form>
+    </div>
 
     <ToastContainer position="bottom-center">
       <Toast className="mb-3" delay={3000} autohide show={toastRegister} onClose={() => setShowToastRegister(false)}>

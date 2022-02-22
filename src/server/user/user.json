@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "username": "admin",
+    "username": "admin@admin.admin",
     "password": "$2a$10$TbEywgRdYipp2iizMAQiB.oD4x3fMlkvABCk5aVNhgYKnGRqb8rl.",
     "role": [
       "ROLE_ADMIN"
@@ -9,7 +9,7 @@
   },
   {
     "id": 2,
-    "username": "user",
+    "username": "user@user.user",
     "password": "$2a$10$VFGpixSc1MBHV3e5AzawLuMjkDsU1brzvt2mSkpSoINXudmAgeGl6",
     "role": [
       "ROLE_USER"

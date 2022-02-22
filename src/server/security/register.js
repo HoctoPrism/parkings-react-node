@@ -4,6 +4,7 @@ const fs = require('fs')
 const bcrypt = require('bcryptjs')
 
 const user = require('../user/user.json')
+const { body, check, validationResult } = require('express-validator')
 const endpoint = './src/server/user/user.json'
 
 app.use(
@@ -17,37 +18,59 @@ function (req, res, next) {
 express.json()
 );
 
-app.post("/register", async (req, res) => {
+app.post("/register", 
+
+    check('password')
+    .notEmpty().withMessage("un mot de passe doit être rempli").bail()
+    .isLength({ min:8 }).withMessage("le mot de passe doit faire au minimum 8 caractères").bail()
+    .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#:$%^&]).{8,}/).withMessage("le mot de passe doit contenir une minuscule, une majuscule, un chiffre et un caractère spéciale").bail(),
+
+    check('username')
+    .notEmpty().withMessage("Veuillez saisir un email").bail()
+    .isEmail().withMessage("Veuillez saisir un email").bail()    
+    .custom( async username => {
+        if (user.find(item => item.username === username)) {
+            return Promise.reject('Cet email a déjà été utilisé !')
+        }
+    }).bail(),
+
+    async (req, res) => {
 
     try {
         let { username, password, role } = req.body;
+        
+        let error = validationResult(req)
+        let finalTab = {
+            username: null,
+            password: null
+        }
+        if (error.errors.length === 0) {
+            // create a new entry for this user if username doesnt exist
+            password = await bcrypt.hash(password, 10);
+            fs.readFile(endpoint, function (err, data) {
+                var json = JSON.parse(data);
+                var id = json.slice(-1).pop().id + 1
+                var role = ["ROLE_USER"]
+                json.push(JSON.parse(JSON.stringify({ id, username, password, role })))
+                fs.writeFile(endpoint, JSON.stringify(json, null, 2), function(err, result) {
+                    if(err) console.log('error', err);
+                }); 
+            }) 
 
-         // Validate user input
-        if (!(username && password)) {
-            res.status(400).send({message: "Tous les champs doivent être remplis"});
+            // return new user
+            res.status(200).send('done');
+        } else {
+            error.errors.forEach( element => {
+                if (element.param == "username") {
+                    finalTab["username"] = element.msg
+                }
+                if (element.param == "password") {
+                    finalTab["password"] = element.msg
+                }
+            })
+            return res.status(400).json(finalTab)
         }
 
-        // check if user already exist
-        const oldUser = user.find(item => item.username === username)
-
-        if (oldUser) {
-            return res.status(409).send({message: "Ce username a déjà été utilisé, veuillez vous connecter !"});
-        }
-
-        // create a new entry for this user if username doesnt exist
-        password = await bcrypt.hash(password, 10);
-        fs.readFile(endpoint, function (err, data) {
-            var json = JSON.parse(data);
-            var id = json.slice(-1).pop().id + 1
-            var role = ["ROLE_USER"]
-            json.push(JSON.parse(JSON.stringify({ id, username, password, role })))
-            fs.writeFile(endpoint, JSON.stringify(json, null, 2), function(err, result) {
-                if(err) console.log('error', err);
-            }); 
-        }) 
-
-        // return new user
-        res.status(200).send('done');
     } catch (err) {
         console.log(err);
     }
