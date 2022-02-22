@@ -21,13 +21,13 @@ express.json()
 app.post("/register", 
 
     check('password')
-    .notEmpty().withMessage("un mot de passe doit être rempli").bail()
-    .isLength({ min:8 }).withMessage("le mot de passe doit faire au minimum 8 caractères").bail()
-    .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#:$%^&]).{8,}/).withMessage("le mot de passe doit contenir une minuscule, une majuscule, un chiffre et un caractère spéciale").bail(),
+    .notEmpty().withMessage("Veuillez saisir un mot de passe").bail()
+    .isLength({ min:8 }).withMessage("Le mot de passe doit faire au minimum 8 caractères").bail()
+    .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#:$%^&])/).withMessage("Le mot de passe doit contenir une minuscule, une majuscule, un chiffre et un caractère spéciale").bail(),
 
     check('username')
     .notEmpty().withMessage("Veuillez saisir un email").bail()
-    .isEmail().withMessage("Veuillez saisir un email").bail()    
+    .isEmail().withMessage("Veuillez saisir un email valide").bail()    
     .custom( async username => {
         if (user.find(item => item.username === username)) {
             return Promise.reject('Cet email a déjà été utilisé !')

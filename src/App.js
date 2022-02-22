@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "react-bootstrap";
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import './App.css';
+import './services/auth.css'
 import Home from "./home/home";
 import Parking from "./parking/parking";
 import PrivateRoute from "./server/security/protected-route";

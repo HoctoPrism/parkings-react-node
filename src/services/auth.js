@@ -2,8 +2,9 @@ import '../App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import jwtDecode from 'jwt-decode';
 import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
-import { useState } from 'react/cjs/react.development';
-import App from '../App';
+import { useEffect, useState } from 'react/cjs/react.development';
+import { useRef } from 'react';
+import { useForm } from 'react-hook-form';
 
 const token = localStorage.getItem('access_token')
 
@@ -27,68 +28,155 @@ function Register () {
 
   document.title = 'Inscription au site'
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const { register, watch, handleSubmit, formState: { errors } } = useForm();
+  const username = watch('username', "");
+  const password = watch('password', "");
   const [role, setRole] = useState("");
   const [errMessage, setErrMessage] = useState("");
   const [toastRegister, setShowToastRegister] = useState(false);
+  const onSubmit = e => registerForm();
 
-  let register = async (e) => {
-      e.preventDefault();
-      try {
-        let register = {
-          username: username,
-          password: password,
-          role: role
-        }
-        let res = await fetch("http://127.0.0.1:8000/register/", {
-          method: "POST",
-          headers: {
-            'Content-Type':'application/json'
-          },
-          body: JSON.stringify(register),
-        });
-        if (res.status === 200) {
-          setShowToastRegister(true)
-        } else {
-          res.json().then(( errValue => setErrMessage(errValue) ));
-        }
-      } catch (err) {
-        console.log(err);
+  const min = useRef()
+  const max = useRef()
+  const num = useRef()
+  const spec = useRef()
+  const valider = useRef()
+
+  const minuscule = '(?=.*[a-z])'; // allow to test lowercase
+  const majuscule = '(?=.*[A-Z])'; // allow to test uppercase
+  const number = '(?=.*[0-9])'; // allow to test number
+  const special = '(?=.*[!@#:$%^&])'; // allow to test special character
+  const errForm = { "min": true, "maj": true, "num": true, "spec": true }; // array of unvalid regex state
+  
+  useEffect(() => {
+/*     console.log(errForm); */
+    // Check if password contains a lowercase
+    if (password.match(minuscule)) {
+      errForm.min = false
+      min.current.style.backgroundColor = "#4F9747"; // if yes, bg green
+    } else {
+      min.current.style.backgroundColor = "#ce0033"; // if not, bg red
+    }
+
+    // Check if password contains a uppercase
+    if (password.match(majuscule)) {
+      errForm.maj = false
+      max.current.style.backgroundColor = "#4F9747"; // if yes, bg green
+    } else {
+      max.current.style.backgroundColor = "#ce0033"; // if not, bg red
+    }
+
+    // Check if password contains a number
+    if (password.match(number)) {
+      errForm.num = false
+      num.current.style.backgroundColor = "#4F9747"; // if yes, bg green
+    } else {
+      num.current.style.backgroundColor = "#ce0033"; // if not, bg red
+    }
+
+    // Check if password contains a special character
+    if (password.match(special)) {
+      errForm.spec = false
+      spec.current.style.backgroundColor = "#4F9747"; // if yes, bg green
+    } else {
+      spec.current.style.backgroundColor = "#ce0033"; // if not, bg red
+    }
+
+    if (errForm.min && errForm.max && errForm.num && errForm.spec){
+      console.log('fion');
+    }
+
+  }, [password, errForm])
+
+  let registerForm = async () => {
+    setErrMessage('')
+    try {
+      let register = {
+        username: username,
+        password: password,
+        role: role
       }
-  }
+      let res = await fetch("http://127.0.0.1:8000/register/", {
+        method: "POST",
+        headers: {
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify(register),
+      });
+      if (res.status === 200) {
+        setErrMessage('')
+        setShowToastRegister(true)
+      } else {
+        res.json().then(( errValue => setErrMessage(errValue) ));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  } 
 
   return <div className='text-center'>
     <h1 className='mb-3'>Inscription au site</h1>
     <div className='d-flex justify-content-center align-items-center'>
-      <Form className='w-25 mt-4' onSubmit={register}>
+      <Form className='w-25 mt-4' onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-        { errMessage ? <div className='fw-bold text-danger'>{errMessage.username}</div> : null}
+        { errMessage ? <div className='fw-bold text-danger'>{errMessage.username}</div> : null} {/* gestion d'erreur prevenant de node */}
+        { errors.username ? <div className='fw-bold text-danger'>{errors.username.message}</div> : null} {/* gestion d'erreur prevenant de react */}
           <Form.Label className='fw-bold'>Email</Form.Label>
           <Form.Control
             className='alt-bg-sombre text-clair border-0 shadow'
-            name="emailOrUsername"
             type="text" 
-            placeholder="email"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            placeholder="username"
+            {...register("username", {
+              required: 'Veuillez saisir un email', 
+              pattern: {
+                value: /^\S+@\S+$/i,
+                message: "Veuillez saisir un email valide"
+              }})}
           />
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicPassword">
-        { errMessage ? <div className='fw-bold text-danger'>{errMessage.password}</div> : null}
-            <Form.Label className='fw-bold'>Mot de passe</Form.Label>
-            <Form.Control
-              className='alt-bg-sombre text-clair border-0 shadow'
-              name="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mot de passe" 
-            />
+        { errMessage ? <div className='fw-bold text-danger'>{errMessage.password}</div> : null} {/* gestion d'erreur prevenant de node */}
+        { errors.password ? <div className='fw-bold text-danger'>{errors.password.message}</div> : null} {/* gestion d'erreur prevenant de react */}
+          <Form.Label className='fw-bold'>Mot de passe</Form.Label>
+          <Form.Control
+            className='alt-bg-sombre text-clair border-0 shadow'
+            type="password"
+            placeholder="password"
+            {...register("password", {
+              required: 'Veuillez saisir un mot de passe', 
+              minLength: {
+                value: 8,
+                message: "Le mot de passe doit faire au minimum 8 caractères"
+              }, 
+              pattern: {
+                value: /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#:$%^&])/,
+                message: "Le mot de passe doit contenir une minuscule, une majuscule, un chiffre et un caractère spéciale"
+              }
+            })}
+          />
         </Form.Group>
 
-        <Button type="submit" className='bg-clair border-0 text-sombre'>VALIDER</Button>
+        <div className="regex">
+          <div className='d-flex justify-content-start align-items-center'>
+              <div ref={min} className="bubble"></div>
+              <div>Le mot de passe doit contenir au moins une minuscule</div>
+          </div>
+          <div className='d-flex justify-content-start align-items-center'>
+              <div ref={max} className="bubble"></div>
+              <div>Le mot de passe doit contenir au moins une majuscule</div>
+          </div>
+          <div className='d-flex justify-content-start align-items-center'>
+              <div ref={num} className="bubble"></div>
+              <div>Le mot de passe doit contenir au moins un chiffre</div>
+          </div>
+          <div className='d-flex justify-content-start align-items-center'>
+              <div ref={spec} className="bubble"></div>
+              <div>Le mot de passe doit contenir au moins un caractère spécial</div>
+          </div>
+        </div>
+
+        <Button type="submit" ref={valider} className='bg-clair border-0 text-sombre'>VALIDER</Button>
       </Form>
     </div>
 
