@@ -28,21 +28,24 @@ app.post('/login', async (req, res) => {
     // ça devrait être du query bdd, mais vu que j'ai un json c'est un peu de la merde
     object = user.find(o => o.username === username) // check if a user exists
 
-    if (object && bcrypt.compare(password, object.password)) {
-        
-        const token = jwt.sign(
-            { user_id: user._id, username },
-            process.env.SECRET_KEY,
-            { expiresIn: "10s" }
-        );
-
-        res.status(200).send({'token': token})
-        res.end();
+    if (object) {
+        bcrypt.compare(password, object.password, (err, isMatch) => {
+            if (err) {
+              throw err
+            } else if (!isMatch) {
+                return res.status(400).send({message: 'Username ou Password invalide !'}).end();
+            } else {
+                const token = jwt.sign(
+                    { user_id: user._id, username },
+                    process.env.SECRET_KEY,
+                    { expiresIn: "10s" }
+                );
+                return res.status(200).send({'token': token}).end()
+            }
+        })
     } else {
-        res.status(400).send({message: 'Username ou Password invalide !'});
-        res.end();
-    }			
-    res.end();
+        return res.status(400).send({message: 'Username ou Password invalide !'}).end();
+    }
 });
 
 module.exports = app;

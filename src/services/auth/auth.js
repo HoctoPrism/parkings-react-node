@@ -204,8 +204,7 @@ function Login () {
 
     let navigate = useNavigate();
     let location = useLocation();
-    let from = location.state?.from?.pathname || "/"; //travail sur la redirection
-
+    let from = location.pathname || "/"; //travail sur la redirection
     let login = async (e) => {
         e.preventDefault();
         try {

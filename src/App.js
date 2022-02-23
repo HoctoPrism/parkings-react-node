@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 import './App.css';
 import LoginButton from "./features/loginButton/LoginButton";
 import './services/auth/auth.css'
@@ -31,6 +31,7 @@ function App () {
 
   return <div>
     <Navbar />
+    <Outlet />
   </div>
 }
 
