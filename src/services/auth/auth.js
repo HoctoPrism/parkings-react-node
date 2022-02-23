@@ -1,10 +1,13 @@
-import '../App.css';
+import '../../App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import jwtDecode from 'jwt-decode';
 import { Button, Form, Toast, ToastContainer } from 'react-bootstrap';
 import { useEffect, useState } from 'react/cjs/react.development';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { loggedFalse, loggedTrue } from '../../features/loginButton/loginButtonSlice';
 
 const token = localStorage.getItem('access_token')
 
@@ -27,6 +30,9 @@ function Guard () {
 function Register () {
 
   document.title = 'Inscription au site'
+
+  let navigate = useNavigate();
+  let location = useLocation();
 
   const { register, watch, handleSubmit, formState: { errors, isDirty, isValid } } = useForm({ mode: "onChange" });
   const username = watch('username', "");
@@ -95,6 +101,7 @@ function Register () {
       if (res.status === 200) {
         setErrMessage('')
         setShowToastRegister(true)
+        navigate('/', { replace: true });
       } else {
         res.json().then(( errValue => setErrMessage(errValue) ));
       }
@@ -188,6 +195,11 @@ function Login () {
     const [password, setPassword] = useState("");
     const [errMessage, setErrMessage] = useState("");
     const [toastLogged, setShowToastLogged] = useState(false);
+    const dispatch = useDispatch()
+
+    let navigate = useNavigate();
+    let location = useLocation();
+    let from = location.state?.from?.pathname || "/"; //travail sur la redirection
 
     let login = async (e) => {
         e.preventDefault();
@@ -206,6 +218,8 @@ function Login () {
           if (res.status === 200) {
             res.json().then( (resValue) => localStorage.setItem('access_token', resValue.token) );
             setShowToastLogged(true)
+            navigate(from, { replace: true });
+            dispatch(loggedTrue())
           } else {
             res.json().then(( errValue => setErrMessage(errValue.message) ));
           }
@@ -217,32 +231,35 @@ function Login () {
     return <div className='text-center'>
       <h1 className='mb-3'>Connexion</h1>
       <h3>Vous devez être connecté pour accéder au site</h3>
+      <Button href='register' className="bg-clair text-sombre border-0 my-2">Créer un compte</Button>
       { errMessage ? <h4 className='fw-bold text-danger'>{errMessage}</h4> : null}
-      <Form className='d-flex justify-content-center align-items-center flex-column mt-4' onSubmit={login}>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label className='fw-bold'>Email ou username</Form.Label>
-          <Form.Control
-            name="emailOrUsername"
-            type="text" 
-            placeholder="email ou username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label className='fw-bold'>Mot de passe</Form.Label>
+      <div className='d-flex justify-content-center align-items-center flex-column '>
+        <Form className='mt-4 w-25' onSubmit={login}>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label className='fw-bold'>Email</Form.Label>
             <Form.Control
-                name="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mot de passe" 
+              className='alt-bg-sombre text-clair border-0 shadow mb-2'
+              type="text" 
+              placeholder="email"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-        </Form.Group>
+          </Form.Group>
 
-        <Button type="submit" className='bg-clair border-0 text-sombre'>Connexion</Button>
-      </Form>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label className='fw-bold'>Mot de passe</Form.Label>
+              <Form.Control
+                  className='alt-bg-sombre text-clair border-0 shadow mb-2'
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Mot de passe" 
+              />
+          </Form.Group>
+
+          <Button type="submit" className='bg-clair border-0 text-sombre'>Connexion</Button>
+        </Form>
+      </div>
 
       <ToastContainer position="bottom-center">
         <Toast className="mb-3" delay={3000} autohide show={toastLogged} onClose={() => setShowToastLogged(false)}>
@@ -254,9 +271,11 @@ function Login () {
     </div>
 }
 
-function Logout() {
-  localStorage.removeItem('access_token')
-  return window.location.href = '/'
+function Logout () {
+  const dispatch = useDispatch()
+  dispatch(loggedFalse())
+  localStorage.removeItem('access_token');
+  return true
 }
 
 export default {Guard, Register, Login, Logout};

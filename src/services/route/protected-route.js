@@ -1,6 +1,6 @@
 import React from 'react'
 import Home from '../../home/home'
-import Auth from '../../services/auth'
+import Auth from '../auth/auth'
 
 const PrivateRoute = ({Component}) => {
 

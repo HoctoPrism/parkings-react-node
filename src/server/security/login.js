@@ -3,7 +3,6 @@ const fs = require('fs')
 const app = express()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-
 const user = require('../user/user.json')
 
 app.use(
@@ -20,7 +19,7 @@ app.use(
 app.post('/login', async (req, res) => {
 
     const { username, password } = req.body;
-    
+
 	if (!(username && password)) {
         res.status(400).send({message: 'Veuillez entrer un Username et un Password !'});
 		res.end();
@@ -39,7 +38,6 @@ app.post('/login', async (req, res) => {
 
         res.status(200).send({'token': token})
         res.end();
-
     } else {
         res.status(400).send({message: 'Username ou Password invalide !'});
         res.end();
